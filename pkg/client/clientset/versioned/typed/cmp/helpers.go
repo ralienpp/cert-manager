@@ -7,8 +7,29 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
+	"net/http"
+	"bytes"
 )
 
+
+// Send a binary payload to a HTTP server and return the server's response body
+func SendPostRequest(payload []byte) []byte {
+    resp, err := http.Post("https://gobyexample.com", "application/pkixcmp", bytes.NewReader(payload))
+    if err != nil {
+        panic(err)
+    }
+    defer resp.Body.Close()
+
+
+	buf := &bytes.Buffer{}
+  	buf.ReadFrom(resp.Body)
+
+	return buf.Bytes()
+
+}
+
+// Generate a PKCS10 certificate signing request and return the raw ASN.1-encoded
+// data
 func GenPkcs10Request() []byte {
 	var oidEmailAddress = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 9, 1}
 	keyBytes, _ := rsa.GenerateKey(rand.Reader, 1024)
