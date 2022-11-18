@@ -1,16 +1,12 @@
 package main
 
 import (
+	"crypto/x509/pkix"
+	"encoding/asn1"
+	"encoding/base64"
+	"encoding/pem"
 	"fmt"
 	"github.com/cert-manager/cert-manager/pkg/client/clientset/versioned/typed/cmp"
-	"encoding/asn1"
-	"crypto/rand"
-    "crypto/rsa"
-    "crypto/x509"
-    "crypto/x509/pkix"
-    "encoding/pem"
-	"encoding/base64"
-    // "fmt"
     "os"
 	"time"
 )
@@ -55,5 +51,7 @@ func main() {
 	fmt.Println(encoded)
 	fmt.Println(b64encoded)
 
-	// gencert()
+	pkcs10 := cmp.GenPkcs10Request()
+	pem.Encode(os.Stdout, &pem.Block{Type: "CERTIFICATE REQUEST", Bytes: pkcs10})
+
 }

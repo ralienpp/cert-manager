@@ -1,8 +1,10 @@
 package cmp
 
-import "encoding/asn1"
-import "time"
-import "crypto/x509/pkix"
+import (
+	"crypto/x509/pkix"
+	"encoding/asn1"
+	"time"
+)
 
 // Cheatsheet
 // OctetString	 []byte
