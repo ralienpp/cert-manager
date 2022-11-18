@@ -9,6 +9,7 @@ import (
 // Cheatsheet
 // OctetString	 []byte
 // UTF8String	 string
+// CHOICE has no direct mapping to Golang, define as asn1.RawValue and parse accordingly
 
 type strDnsName string
 
