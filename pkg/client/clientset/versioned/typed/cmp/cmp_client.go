@@ -7,7 +7,6 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
-	"encoding/asn1"
 	"fmt"
 )
 

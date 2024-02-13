@@ -69,83 +69,83 @@ const (
 )
 
 var (
-	oidCountry            = asn1.ObjectIdentifier{2, 5, 4, 6}
-	oidOrganization       = asn1.ObjectIdentifier{2, 5, 4, 10}
-	oidOrganizationalUnit = asn1.ObjectIdentifier{2, 5, 4, 11}
-	oidCommonName         = asn1.ObjectIdentifier{2, 5, 4, 3}
-	oidSerialNumber       = asn1.ObjectIdentifier{2, 5, 4, 5}
-	oidLocality           = asn1.ObjectIdentifier{2, 5, 4, 7}
-	oidProvince           = asn1.ObjectIdentifier{2, 5, 4, 8}
-	oidStreetAddress      = asn1.ObjectIdentifier{2, 5, 4, 9}
-	oidPostalCode         = asn1.ObjectIdentifier{2, 5, 4, 17}
+	OidCountry            = asn1.ObjectIdentifier{2, 5, 4, 6}
+	OidOrganization       = asn1.ObjectIdentifier{2, 5, 4, 10}
+	OidOrganizationalUnit = asn1.ObjectIdentifier{2, 5, 4, 11}
+	OidCommonName         = asn1.ObjectIdentifier{2, 5, 4, 3}
+	OidSerialNumber       = asn1.ObjectIdentifier{2, 5, 4, 5}
+	OidLocality           = asn1.ObjectIdentifier{2, 5, 4, 7}
+	OidProvince           = asn1.ObjectIdentifier{2, 5, 4, 8}
+	OidStreetAddress      = asn1.ObjectIdentifier{2, 5, 4, 9}
+	OidPostalCode         = asn1.ObjectIdentifier{2, 5, 4, 17}
 )
 
 var (
-	oidHMACWithSHA1   = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 8, 1, 2}
-	oidHMACWithSHA256 = asn1.ObjectIdentifier{1, 2, 840, 113549, 2, 9}
-	oidHMACWithSHA384 = asn1.ObjectIdentifier{1, 2, 840, 113549, 2, 10}
-	oidHMACWithSHA512 = asn1.ObjectIdentifier{1, 2, 840, 113549, 2, 11}
+	OidHMACWithSHA1   = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 8, 1, 2}
+	OidHMACWithSHA256 = asn1.ObjectIdentifier{1, 2, 840, 113549, 2, 9}
+	OidHMACWithSHA384 = asn1.ObjectIdentifier{1, 2, 840, 113549, 2, 10}
+	OidHMACWithSHA512 = asn1.ObjectIdentifier{1, 2, 840, 113549, 2, 11}
 
-	oidSHA1   = asn1.ObjectIdentifier{1, 3, 14, 3, 2, 26}
+	OidSHA1   = asn1.ObjectIdentifier{1, 3, 14, 3, 2, 26}
 
-	oidPBM = asn1.ObjectIdentifier{1, 2, 840, 113533, 7, 66, 13}
+	OidPBM = asn1.ObjectIdentifier{1, 2, 840, 113533, 7, 66, 13}
 )
 
 // https://cs.opensource.google/go/go/+/refs/tags/go1.21.6:src/crypto/x509/x509.go;l=327
 var (
-	oidSignatureMD2WithRSA      = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 2}
-	oidSignatureMD5WithRSA      = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 4}
-	oidSignatureSHA1WithRSA     = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 5}
-	oidSignatureSHA256WithRSA   = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 11}
-	oidSignatureSHA384WithRSA   = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 12}
-	oidSignatureSHA512WithRSA   = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 13}
-	oidSignatureRSAPSS          = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 10}
-	oidSignatureDSAWithSHA1     = asn1.ObjectIdentifier{1, 2, 840, 10040, 4, 3}
-	oidSignatureDSAWithSHA256   = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 3, 2}
-	oidSignatureECDSAWithSHA1   = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 1}
-	oidSignatureECDSAWithSHA256 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 2}
-	oidSignatureECDSAWithSHA384 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 3}
-	oidSignatureECDSAWithSHA512 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 4}
-	oidSignatureEd25519         = asn1.ObjectIdentifier{1, 3, 101, 112}
+	OidSignatureMD2WithRSA      = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 2}
+	OidSignatureMD5WithRSA      = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 4}
+	OidSignatureSHA1WithRSA     = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 5}
+	OidSignatureSHA256WithRSA   = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 11}
+	OidSignatureSHA384WithRSA   = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 12}
+	OidSignatureSHA512WithRSA   = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 13}
+	OidSignatureRSAPSS          = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 10}
+	OidSignatureDSAWithSHA1     = asn1.ObjectIdentifier{1, 2, 840, 10040, 4, 3}
+	OidSignatureDSAWithSHA256   = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 3, 2}
+	OidSignatureECDSAWithSHA1   = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 1}
+	OidSignatureECDSAWithSHA256 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 2}
+	OidSignatureECDSAWithSHA384 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 3}
+	OidSignatureECDSAWithSHA512 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 4}
+	OidSignatureEd25519         = asn1.ObjectIdentifier{1, 3, 101, 112}
 
-	oidSHA256 = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 2, 1}
-	oidSHA384 = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 2, 2}
-	oidSHA512 = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 2, 3}
+	OidSHA256 = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 2, 1}
+	OidSHA384 = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 2, 2}
+	OidSHA512 = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 2, 3}
 
-	oidMGF1 = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 8}
+	OidMGF1 = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 8}
 
 	// oidISOSignatureSHA1WithRSA means the same as oidSignatureSHA1WithRSA
 	// but it's specified by ISO. Microsoft's makecert.exe has been known
 	// to produce certificates with this OID.
-	oidISOSignatureSHA1WithRSA = asn1.ObjectIdentifier{1, 3, 14, 3, 2, 29}
+	OidISOSignatureSHA1WithRSA = asn1.ObjectIdentifier{1, 3, 14, 3, 2, 29}
 )
 
 
 // https://cs.opensource.google/go/go/+/refs/tags/go1.21.6:src/crypto/x509/x509.go;l=355
-var signatureAlgorithmDetails = []struct {
-	algo       x509.SignatureAlgorithm
-	name       string
-	oid        asn1.ObjectIdentifier
-	pubKeyAlgo x509.PublicKeyAlgorithm
-	hash       crypto.Hash
+var SignatureAlgorithmDetails = []struct {
+	Algo       x509.SignatureAlgorithm
+	Name       string
+	Oid        asn1.ObjectIdentifier
+	PubKeyAlgo x509.PublicKeyAlgorithm
+	Hash       crypto.Hash
 }{
-	{x509.MD2WithRSA, "MD2-RSA", oidSignatureMD2WithRSA, x509.RSA, crypto.Hash(0) /* no value for MD2 */},
-	{x509.MD5WithRSA, "MD5-RSA", oidSignatureMD5WithRSA, x509.RSA, crypto.MD5},
-	{x509.SHA1WithRSA, "SHA1-RSA", oidSignatureSHA1WithRSA, x509.RSA, crypto.SHA1},
-	{x509.SHA1WithRSA, "SHA1-RSA", oidISOSignatureSHA1WithRSA, x509.RSA, crypto.SHA1},
-	{x509.SHA256WithRSA, "SHA256-RSA", oidSignatureSHA256WithRSA, x509.RSA, crypto.SHA256},
-	{x509.SHA384WithRSA, "SHA384-RSA", oidSignatureSHA384WithRSA, x509.RSA, crypto.SHA384},
-	{x509.SHA512WithRSA, "SHA512-RSA", oidSignatureSHA512WithRSA, x509.RSA, crypto.SHA512},
-	{x509.SHA256WithRSAPSS, "SHA256-RSAPSS", oidSignatureRSAPSS, x509.RSA, crypto.SHA256},
-	{x509.SHA384WithRSAPSS, "SHA384-RSAPSS", oidSignatureRSAPSS, x509.RSA, crypto.SHA384},
-	{x509.SHA512WithRSAPSS, "SHA512-RSAPSS", oidSignatureRSAPSS, x509.RSA, crypto.SHA512},
-	{x509.DSAWithSHA1, "DSA-SHA1", oidSignatureDSAWithSHA1, x509.DSA, crypto.SHA1},
-	{x509.DSAWithSHA256, "DSA-SHA256", oidSignatureDSAWithSHA256, x509.DSA, crypto.SHA256},
-	{x509.ECDSAWithSHA1, "ECDSA-SHA1", oidSignatureECDSAWithSHA1, x509.ECDSA, crypto.SHA1},
-	{x509.ECDSAWithSHA256, "ECDSA-SHA256", oidSignatureECDSAWithSHA256, x509.ECDSA, crypto.SHA256},
-	{x509.ECDSAWithSHA384, "ECDSA-SHA384", oidSignatureECDSAWithSHA384, x509.ECDSA, crypto.SHA384},
-	{x509.ECDSAWithSHA512, "ECDSA-SHA512", oidSignatureECDSAWithSHA512, x509.ECDSA, crypto.SHA512},
-	{x509.PureEd25519, "Ed25519", oidSignatureEd25519, x509.Ed25519, crypto.Hash(0) /* no pre-hashing */},
+	{x509.MD2WithRSA, "MD2-RSA", OidSignatureMD2WithRSA, x509.RSA, crypto.Hash(0) /* no value for MD2 */},
+	{x509.MD5WithRSA, "MD5-RSA", OidSignatureMD5WithRSA, x509.RSA, crypto.MD5},
+	{x509.SHA1WithRSA, "SHA1-RSA", OidSignatureSHA1WithRSA, x509.RSA, crypto.SHA1},
+	{x509.SHA1WithRSA, "SHA1-RSA", OidISOSignatureSHA1WithRSA, x509.RSA, crypto.SHA1},
+	{x509.SHA256WithRSA, "SHA256-RSA", OidSignatureSHA256WithRSA, x509.RSA, crypto.SHA256},
+	{x509.SHA384WithRSA, "SHA384-RSA", OidSignatureSHA384WithRSA, x509.RSA, crypto.SHA384},
+	{x509.SHA512WithRSA, "SHA512-RSA", OidSignatureSHA512WithRSA, x509.RSA, crypto.SHA512},
+	{x509.SHA256WithRSAPSS, "SHA256-RSAPSS", OidSignatureRSAPSS, x509.RSA, crypto.SHA256},
+	{x509.SHA384WithRSAPSS, "SHA384-RSAPSS", OidSignatureRSAPSS, x509.RSA, crypto.SHA384},
+	{x509.SHA512WithRSAPSS, "SHA512-RSAPSS", OidSignatureRSAPSS, x509.RSA, crypto.SHA512},
+	{x509.DSAWithSHA1, "DSA-SHA1", OidSignatureDSAWithSHA1, x509.DSA, crypto.SHA1},
+	{x509.DSAWithSHA256, "DSA-SHA256", OidSignatureDSAWithSHA256, x509.DSA, crypto.SHA256},
+	{x509.ECDSAWithSHA1, "ECDSA-SHA1", OidSignatureECDSAWithSHA1, x509.ECDSA, crypto.SHA1},
+	{x509.ECDSAWithSHA256, "ECDSA-SHA256", OidSignatureECDSAWithSHA256, x509.ECDSA, crypto.SHA256},
+	{x509.ECDSAWithSHA384, "ECDSA-SHA384", OidSignatureECDSAWithSHA384, x509.ECDSA, crypto.SHA384},
+	{x509.ECDSAWithSHA512, "ECDSA-SHA512", OidSignatureECDSAWithSHA512, x509.ECDSA, crypto.SHA512},
+	{x509.PureEd25519, "Ed25519", OidSignatureEd25519, x509.Ed25519, crypto.Hash(0) /* no pre-hashing */},
 }
 
 /*
@@ -188,7 +188,7 @@ func (pkiMessage *PKIMessage) Protect(sharedSecret string) (err error) {
 
 	protAlgorithm := pkiMessage.Header.ProtectionAlg
 
-	if !protAlgorithm.Algorithm.Equal(oidPBM) {
+	if !protAlgorithm.Algorithm.Equal(OidPBM) {
 		err = errors.New("only PBM supported as protection Algorithm")
 		return
 	}
@@ -198,13 +198,13 @@ func (pkiMessage *PKIMessage) Protect(sharedSecret string) (err error) {
 	var oneWayFunction hash.Hash
 
 	switch {
-	case oidSHA1.Equal(pbmParameter.OWF.Algorithm):
+	case OidSHA1.Equal(pbmParameter.OWF.Algorithm):
 		oneWayFunction = sha1.New()
-	case oidSHA256.Equal(pbmParameter.OWF.Algorithm):
+	case OidSHA256.Equal(pbmParameter.OWF.Algorithm):
 		oneWayFunction = sha256.New()
-	case oidSHA384.Equal(pbmParameter.OWF.Algorithm):
+	case OidSHA384.Equal(pbmParameter.OWF.Algorithm):
 		oneWayFunction = sha512.New384()
-	case oidSHA512.Equal(pbmParameter.OWF.Algorithm):
+	case OidSHA512.Equal(pbmParameter.OWF.Algorithm):
 		oneWayFunction = sha512.New()
 	default:
 		err = errors.New("only SHA1, SHA256, SHA384 and SHA512 supported as OWF")
@@ -216,13 +216,13 @@ func (pkiMessage *PKIMessage) Protect(sharedSecret string) (err error) {
 	var hmacFunction hash.Hash
 
 	switch {
-	case oidHMACWithSHA1.Equal(pbmParameter.MAC.Algorithm):
+	case OidHMACWithSHA1.Equal(pbmParameter.MAC.Algorithm):
 		hmacFunction = hmac.New(sha1.New, baseKey)
-	case oidHMACWithSHA256.Equal(pbmParameter.MAC.Algorithm):
+	case OidHMACWithSHA256.Equal(pbmParameter.MAC.Algorithm):
 		hmacFunction = hmac.New(sha256.New, baseKey)
-	case oidHMACWithSHA384.Equal(pbmParameter.MAC.Algorithm):
+	case OidHMACWithSHA384.Equal(pbmParameter.MAC.Algorithm):
 		hmacFunction = hmac.New(sha512.New384, baseKey)
-	case oidHMACWithSHA512.Equal(pbmParameter.MAC.Algorithm):
+	case OidHMACWithSHA512.Equal(pbmParameter.MAC.Algorithm):
 		hmacFunction = hmac.New(sha512.New, baseKey)
 	default:
 		err = errors.New("only SHA1, SHA256, SHA384 and SHA512 supported as HashFunction")
@@ -345,15 +345,15 @@ type GeneralName asn1.RawValue
 		registeredID                    [8]     OBJECT IDENTIFIER }
 */
 const (
-	otherName = iota
-	rfc822Name
-	dNSName
-	x400Address
-	directoryName
-	ediPartyName
-	uniformResourceIdentifier
-	iPAddress
-	registeredID
+	OtherName = iota
+	Rfc822Name
+	DNSName
+	X400Address
+	DirectoryName
+	EdiPartyName
+	UniformResourceIdentifier
+	IPAddress
+	RegisteredID
 )
 
 type KeyIdentifier []byte

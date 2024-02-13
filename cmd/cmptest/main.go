@@ -1,155 +1,282 @@
+//minimal self-contained example from the RufusJWB fork
+
 package main
 
+// import (
+// 	"encoding/base64"
+// 	"strings"
+// )
+
+
 import (
+	"bytes"
+	"crypto"
+	"crypto/rand"
+	x509 "crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
-	"encoding/base64"
 	"encoding/pem"
 	"fmt"
-	"github.com/cert-manager/cert-manager/pkg/client/clientset/versioned/typed/cmp"
+	"io"
+	"log"
+	"net/http"
 	"os"
-	"strings"
+	"reflect"
 	"time"
+	"github.com/cert-manager/cert-manager/pkg/client/clientset/versioned/typed/cmp"
 )
 
 func main() {
-	fmt.Println(cmp.Cmp1999)
+	senderCommonName := "CloudCA-Integration-Test-User"
+	senderDN := cmp.Name{
+		[]pkix.AttributeTypeAndValue{
+			{Type: cmp.OidCommonName, Value: senderCommonName}}}
 
-	var header cmp.PkiHeader
-	header.Pvno = cmp.Cmp2021
-	header.FreeText = []string{"aaaaa", "bbbbb", "ccccc"}
-	header.SenderNonce = []byte{0, 0, 0, 0, 0}
-	header.RecipNonce = []byte{1, 1, 1, 1, 1}
+	recipientCommonName := "CloudPKI-Integration-Test"
+	recipientDN := cmp.Name{
+		[]pkix.AttributeTypeAndValue{
+			{Type: cmp.OidCommonName, Value: recipientCommonName}}}
 
-	// sender := pkix.Name{
-	//     CommonName:         "example.com",
-	//     Country:            []string{"MD"},
-	// }
-	// header.Sender = sender
-	header.Sender = "localhost"
-	header.Recipient = "taget-ca.com"
+	sharedSecret := "SiemensIT"
 
-	header.MessageTime = time.Now().UTC()
+	url := "https://broker.sdo-qa.siemens.cloud/.well-known/cmp"
 
-	// TODO this must be taken dynamically from the CSR itself
-	header.ProtectionAlg = pkix.AlgorithmIdentifier{
-		Algorithm: asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 1},
+	randomTransactionID := createRandom(16)
+
+	randomSenderNonce := createRandom(16)
+	randomRecipNonce := createRandom(16)
+
+	csr := `-----BEGIN CERTIFICATE REQUEST-----
+MIIEwDCCAqgCAQAwGzEZMBcGA1UEAxMQdGVzdC5leGFtcGxlLmNvbTCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBAJYtP4iLdUBt96pl3Exrz/UXzSuTsZ+i
+f7cnoFz+DyzS3+6pPLSS7o37g8xxZlqJecY6CfDeLY40maFIsHM4CgkVldwdy4F7
+SByFwVZseozGoWGOSSD2ceSMA6qgKmgSRUqwumLJdOJqc5bDQYQqPYabp66hrm9q
+VNGlC33XPJ5btITCTwWp+3LNcUYdAPDsMSY/MF8ejExITKjj8M/Xt82vSxY4VNl8
+kkSvwmOSSdfzpyl1MN9+zVslUyGJywQyV4vcLqJrM9C32nnh1SY4oE000GTGSbIa
+w5kolzrsSBVmLxuNhrgrg4IHZMaYn1OtrI3yVUXuAU0CENHfpUo20CBjTt43ReBo
+2HXPoWbxULUOqIDQQELl3ZMOxjt7owXfm5go7EsqMKbPAKtHGuFZkVe/C6JYheWQ
+nl0mGC2yfhEix3zviReTmocLLWAeTz3bVO3+jD3aKliv/RA1zyYIwWycAZuVJ17o
+e2ceBnHM0/ccO/3giERqHIn+u8hUduCRIo+S1bEB6/Mf91QYFX63uPkYzs4TW/1I
+3pklIOiYCbedVORs+U7GMcgPMOa6+oZHYsd2Q/kFly7K0RfhY/g/YTGkLW4LhXSU
+/lplOSZEasTrz5az8cdJK4JL8OAfCe6qN6gKMNNhTJC3AYVa0ATbazGvQdkEHCNn
+mFr4VRwVfV2zAgMBAAGgYDBeBgkqhkiG9w0BCQ4xUTBPMAwGA1UdEwEB/wQCMAAw
+HQYDVR0OBBYEFIa6xq2GOW+R3JVCWZMwTadF7m+2MAsGA1UdDwQEAwIDuDATBgNV
+HSUEDDAKBggrBgEFBQcDAjANBgkqhkiG9w0BAQ0FAAOCAgEAkiXuuU3/dXh3fYX2
+agt3JoJ8+GmPSVLvLbwiCkxNnJkI28gpn0BROO+QGUSHRSVaoUM1/GYb1XpXQvDd
+LIC5ZC/jlXpC5/PcnvCOQu3YJmEQeDub6YrFcFLMkf1dhOBfEywrEZwfyQ/2tNUZ
+FU9yiW0gF015651y8Xl0WMCCi8nsZ19o8MI2zzzafvpyk0M66IYq1GpRM4MzHcnf
+YzA4RygZwlrf1fiMjPrzY0oh3U53M1ejGBoAAHSqNJ0rf02FU0U+5M8SaoById8v
+ITgegC1Gsga/ox41Leiiinqudije+BX66wze/ZnjKFMfjlg2vBQChzyrTOZ07U2w
+T7v8Ey0Go0meB7sjyaKVrJiinI95Woyk/JrvUbTXW6lSVBiTkj+PKQGaGT3otIDo
+8HWI35EWs0FoKndUh3MznvsnRycf+7cPoS3prVThmA+bxS1z+pMFwYRFhl63OCQP
+kCDAJsS9LESD2wDIrv7Hmxu9SAVwqmil8KMNlwGbBj+MzE9OUUTmL7BQYujVVV8i
+MdBk6ysluKbfbolzkPKZxdZHs9YsC3szT8a7U1OY/tABBrF3D6cbEJFZgscuZFgW
+LSnod9g7TZsgTN3TY9V6xj6tERl+0/kMTcnQV55UOWAPCQqk0SrwdB9i2ebZCVgQ
+1qrQsPB5Gv8K5COmC9b7VY4czB4=
+-----END CERTIFICATE REQUEST-----
+`
+	certificateRequest, _ := pem.Decode([]byte(csr))
+	if certificateRequest == nil {
+		log.Fatal("failed to decode PEM block containing the CSR")
 	}
+	parsedCSR, _ := x509.ParseCertificateRequest(certificateRequest.Bytes)
+	csrPublicKey := parsedCSR.PublicKey
 
-	header.SenderKid = []byte{2, 2, 2, 2, 2}
-	header.RecipKid = []byte{3, 3, 3, 3, 3}
+	randomSalt := createRandom(16)
 
-	header.TransactionId = []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-
-	// header.Samba = "haha"
-	encoded, _ := asn1.Marshal(header)
-	b64encoded := base64.StdEncoding.EncodeToString(encoded)
-	// fmt.Println(encoded)
-	// fmt.Println(b64encoded)
-
-	pkcs10 := cmp.GenPkcs10Request()
-	pem.Encode(os.Stdout, &pem.Block{Type: "CERTIFICATE REQUEST", Bytes: pkcs10})
-
-	var message cmp.PkiMessage
-	message.Header = header
-	message.Body = asn1.RawValue{Class: 0, Tag: 4, IsCompound: true, FullBytes: pkcs10}
-
-	// SerialNumber:       RawValue{Class: 0, Tag: 2, IsCompound: false, Bytes: []uint8{0x0, 0x8c, 0xc3, 0x37, 0x92, 0x10, 0xec, 0x2c, 0x98}, FullBytes: []byte{2, 9, 0x0, 0x8c, 0xc3, 0x37, 0x92, 0x10, 0xec, 0x2c, 0x98}},
-
-	// result := cmp.SendPostRequest(pkcs10)
-	// fmt.Println(string(result))
-
-	encoded, _ = asn1.Marshal(message)
-	b64encoded = base64.StdEncoding.EncodeToString(encoded)
-	// fmt.Println(encoded)
-	fmt.Println("Locally constructed PKIMessage:")
-	fmt.Println(b64encoded)
-
-	// fmt.Println("Load and parse experiment of a sniffed PKIMessage")
-	// canonicPayload := cmp.LoadFile("/home/debdeveu/code/payloads/packet-p10cr-pkimessage.bin")
-
-	// canonicalMessage := new(cmp.PkiMessage)
-	// _, _ = asn1.Unmarshal(canonicPayload, canonicalMessage)
-	// // fmt.Println(err)
-	// // fmt.Println(canonicalMessage.Header.Pvno)
-	// fmt.Println(canonicalMessage)
-
-	// template, _ := cmp.CreateCertTemplate("Murzilka")
-	// encoded, _ = asn1.Marshal(template)
-	// b64encoded = base64.StdEncoding.EncodeToString(encoded)
-	// fmt.Println("Simple CertTemplate:")
-	// fmt.Println(b64encoded)
-
-	nameComponents := []cmp.Dn{
-		{
-			Oid:   cmp.Oidify("2.5.4.6"),
-			Value: []byte("Germany"),
+	p10RequestMessage := cmp.PKIMessage{
+		Header: cmp.PKIHeader{
+			PVNO:        cmp.CMP2000,
+			Sender:      cmp.ChoiceConvert(senderDN, cmp.DirectoryName),
+			Recipient:   cmp.ChoiceConvert(recipientDN, cmp.DirectoryName),
+			MessageTime: time.Now(),
+			ProtectionAlg: cmp.AlgorithmIdentifier{
+				Algorithm: cmp.OidPBM,
+				Parameters: cmp.PBMParameter{
+					Salt: randomSalt,
+					OWF: cmp.AlgorithmIdentifier{
+						Algorithm:  cmp.OidSHA512,
+						Parameters: []byte{},
+					},
+					IterationCount: 262144,
+					MAC: cmp.AlgorithmIdentifier{
+						Algorithm:  cmp.OidHMACWithSHA512,
+						Parameters: []byte{},
+					},
+				},
+			},
+			SenderKID:     cmp.KeyIdentifier(senderDN.String()),
+			RecipientKID:  cmp.KeyIdentifier(recipientDN.String()),
+			TransactionID: randomTransactionID,
+			SenderNonce:   randomSenderNonce,
+			RecipNonce:    randomRecipNonce,
 		},
-		{
-			Oid:   []int{2, 5, 4, 7},
-			Value: []byte("Bayern"),
+		Body: asn1.RawValue{Bytes: certificateRequest.Bytes, IsCompound: true, Class: asn1.ClassContextSpecific, Tag: cmp.PKCS10CertificationRequest},
+	}
+
+	responseBody := sendCMPMessage(p10RequestMessage, sharedSecret, url)
+
+	var responseMessage cmp.PKIMessage
+	asn1.Unmarshal(responseBody, &responseMessage)
+
+	if !bytes.Equal(responseMessage.Header.TransactionID, randomTransactionID) {
+		log.Fatal("TransactionID is not equale")
+	}
+
+	if !bytes.Equal(randomSenderNonce, responseMessage.Header.RecipNonce) {
+		log.Fatal("Nonce is not equale")
+	}
+
+	if responseMessage.Body.Tag != cmp.CertificationResponse {
+		log.Fatalf("Response message of type %v", responseMessage.Body.Tag)
+	}
+
+	var certRepMessage cmp.CertRepMessage
+	asn1.Unmarshal(responseMessage.Body.Bytes, &certRepMessage)
+
+	if len(certRepMessage.Response) != 1 {
+		log.Fatalf("Response contained %v certificates", len(certRepMessage.Response))
+	}
+
+	if certRepMessage.Response[0].CertifiedKeyPair.CertOrEncCert.Tag != cmp.Certificate {
+		log.Fatalf("Response certificate of type %v", certRepMessage.Response[0].CertifiedKeyPair.CertOrEncCert.Tag)
+	}
+
+	certificate, _ := x509.ParseCertificate(certRepMessage.Response[0].CertifiedKeyPair.CertOrEncCert.Bytes)
+
+	fmt.Printf("Certificate issued to %v\n", certificate.Subject)
+	fmt.Printf("Certificate issued by %v\n", certificate.Issuer)
+	fmt.Printf("Certificate valid from %v\n", certificate.NotBefore)
+	fmt.Printf("Certificate valid until %v\n", certificate.NotAfter)
+
+	block := &pem.Block{
+		Type: "CERTIFICATE",
+		Headers: nil,
+		Bytes: certificate.Raw,
+	}
+	pem.Encode(os.Stdout, block)
+
+	if !reflect.DeepEqual(csrPublicKey, certificate.PublicKey) {
+		log.Fatalf("Certificate doesn't match to key provided in CSR")
+	}
+
+	/*
+	   certHash    OCTET STRING,
+	   -- the hash of the certificate, using the same hash algorithm
+	   -- as is used to create and verify the certificate signature
+	*/
+	signAlgorithm := certificate.SignatureAlgorithm
+
+	var hashType crypto.Hash
+
+	for _, details := range cmp.SignatureAlgorithmDetails {
+		if details.Algo == signAlgorithm {
+			hashType = details.Hash
+		}
+	}
+
+	hashFunc := hashType.New()
+
+	hashFunc.Reset()
+	hashFunc.Write(certificate.Raw)
+	certHash := hashFunc.Sum(nil)
+
+	randomSenderNonce = createRandom(16)
+	randomSalt = createRandom(16)
+
+	certConfMessage := cmp.PKIMessage{
+		Header: cmp.PKIHeader{
+			PVNO:        cmp.CMP2000,
+			Sender:      cmp.ChoiceConvert(senderDN, cmp.DirectoryName),
+			Recipient:   cmp.ChoiceConvert(recipientDN, cmp.DirectoryName),
+			MessageTime: time.Now(),
+			ProtectionAlg: cmp.AlgorithmIdentifier{
+				Algorithm: cmp.OidPBM,
+				Parameters: cmp.PBMParameter{
+					Salt: randomSalt,
+					OWF: cmp.AlgorithmIdentifier{
+						Algorithm:  cmp.OidSHA512,
+						Parameters: []byte{},
+					},
+					IterationCount: 262144,
+					MAC: cmp.AlgorithmIdentifier{
+						Algorithm:  cmp.OidHMACWithSHA512,
+						Parameters: []byte{},
+					},
+				},
+			},
+			SenderKID:     cmp.KeyIdentifier(senderDN.String()),
+			RecipientKID:  cmp.KeyIdentifier(recipientDN.String()),
+			TransactionID: randomTransactionID,
+			SenderNonce:   randomSenderNonce,
+			RecipNonce:    responseMessage.Header.SenderNonce,
 		},
+		Body: cmp.ChoiceConvert(cmp.CertConfirmContent{
+			cmp.CertStatus{
+				CertHash:  certHash,
+				CertReqID: 0,
+			},
+		}, cmp.CertificateConfirm),
 	}
 
-	subjectName := cmp.CreateSubject(nameComponents)
+	certConfResponseBody := sendCMPMessage(certConfMessage, sharedSecret, url)
 
-	template := cmp.CreateCertTemplate(subjectName)
-	encoded, _ = asn1.Marshal(template)
-	b64encoded = base64.StdEncoding.EncodeToString(encoded)
-	fmt.Println("Simple CertTemplate:")
-	fmt.Println(b64encoded)
+	var certConfResponseMessage cmp.PKIMessage
+	asn1.Unmarshal(certConfResponseBody, &certConfResponseMessage)
 
-	fmt.Println(cmp.Oidify("1.2.3.4.5"))
-
-	certRequest := cmp.CertRequest{
-		CertReqId:    1945,
-		CertTemplate: template,
+	if !bytes.Equal(certConfResponseMessage.Header.TransactionID, randomTransactionID) {
+		log.Fatal("TransactionID is not equale")
 	}
-	encoded, _ = asn1.Marshal(certRequest)
-	b64encoded = base64.StdEncoding.EncodeToString(encoded)
-	fmt.Println("Simple CertRequest:")
-	fmt.Println(b64encoded)
 
-	certRequestMessage := cmp.CertReqMessage{
-		CertReq: certRequest,
+	if !bytes.Equal(randomSenderNonce, certConfResponseMessage.Header.RecipNonce) {
+		log.Fatal("Nonce is not equale")
 	}
-	encoded, _ = asn1.Marshal(certRequestMessage)
-	b64encoded = base64.StdEncoding.EncodeToString(encoded)
-	fmt.Println("Simple CertRequestMessage:")
-	fmt.Println(b64encoded)
 
-	pkiBody := cmp.CreatePkiBodyCr(1945, template)
-	encoded, _ = asn1.Marshal(pkiBody)
-	b64encoded = base64.StdEncoding.EncodeToString(encoded)
-	fmt.Println("Simple PkiBody: ")
-	fmt.Println(b64encoded)
+	if certConfResponseMessage.Body.Tag != cmp.Confirmation {
+		log.Fatalf("Response message of type %v", responseMessage.Body.Tag)
+	}
 
-	pkiMessage := cmp.CreatePkiMessage(header, pkiBody)
-	encoded, _ = asn1.Marshal(pkiMessage)
-	b64encoded = base64.StdEncoding.EncodeToString(encoded)
-	fmt.Println("Simple PkiMessage: ")
-	fmt.Println(b64encoded)
-
-	// This is the b64 contents of raw-cmp-request-ir.bin, which contains an IR PKIMessage
-	dataFromFile := `MIICZzCBwQIBAqQCMACkOTA3MREwDwYDVQQDDAhBZG1pbkNBMTEVMBMGA1UECgwMRUpCQ0EgU2Ft
-	cGxlMQswCQYDVQQGEwJTRaARGA8yMDEwMDkwODA3MjUwMFqhOjA4BgkqhkiG9n0HQg0wKwQQngNA
-	7p504zI55zFUUj6C+DAHBgUrDgMCGgICAfQwCgYIKwYBBQUIAQKiBgQEdXNlcqQSBBAv/E+XD+WO
-	9CEk39Gi46oYpRIEEN5PD8sgnWhMIc1RyL4nnCOgggGGMIIBgjCCAX4wgdECAQAwgculJzAlMQ0w
-	CwYDVQQDEwR1c2VyMRQwEgYKCZImiZPyLGQBARMEdXNlcqaBnzANBgkqhkiG9w0BAQEFAAOBjQAw
-	gYkCgYEA8fFli76QU8rWFNf/RXI8e+tf6EoV7v9hGWU8zByFQDsYqwH9QEdZtUq8mrbZfI1KlN8+
-	Z9cxynyDp/wkS0+m8bvUWWZa/vCeTvuy5IAfPAgS11SLDK4iJ0tw12zUm74pqVH+jw0MWz7IG7TR
-	zzZgXoTmfbze/BYukSd+s+kWRKsCAwEAAaGBkzANBgkqhkiG9w0BAQUFAAOBgQCNnB7a9bLlOxj5
-	ZQdw4+Bt+ZzUed2EwKIPgiHOmVcr5akwCWFEHb2SlsCeSI8f4FkoJN3ZaQ0fpXB1Jl0I+6XOIyFU
-	BkWV1dPwBk2B6WwiWM4ByrAjkZQ+sB6ZyrE7gIzc4/V3/5QULeHf4oMBdjkihmmQSEjf2rD0DZH0
-	JkxsNDASMBAGCSsGAQUFBwUBAQwDcHdkoBcDFQDCgptN9M86V8FmmA28sWvxBbuwPA==`
-
-	dataFromFile = strings.Replace(dataFromFile, "\r", "", -1)
-	dataFromFile = strings.Replace(dataFromFile, "\n", "", -1)
-	dataFromFile = strings.Replace(dataFromFile, "\t", "", -1)
-	// fmt.Println(dataFromFile)
-	exampleRequestIr, _ := base64.StdEncoding.DecodeString(dataFromFile)
-
-	asn1PkiMessage := cmp.ParsePkiMessage(exampleRequestIr)
-	fmt.Println(asn1PkiMessage)
-	fmt.Println(asn1PkiMessage.Header.MessageTime)
+	fmt.Println("All done!")
 }
+
+func sendCMPMessage(requestMessage cmp.PKIMessage, sharedSecret string, url string) (body []byte) {
+	requestMessage.Protect(sharedSecret)
+
+	pkiMessageAsDER, err1 := asn1.Marshal(requestMessage)
+	if err1 != nil {
+		log.Fatalf("Error marshaling structure 1: %v", err1)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Post(url, "application/pkixcmp", bytes.NewReader(pkiMessageAsDER))
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		log.Fatalf("Status code %v doesn't equal 200", resp.Status)
+	}
+
+	body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("Error reading response body: %v", err)
+	}
+
+	return
+}
+
+func createRandom(n int) (randomValue []byte) {
+	randomValue = make([]byte, n)
+	nRead, err := rand.Read(randomValue)
+
+	if err != nil {
+		log.Fatalf("Read err %v", err)
+	}
+	if nRead != n {
+		log.Fatalf("Read returned unexpected n; %d != %d", nRead, n)
+	}
+	return
+}
+
