@@ -1,4 +1,5 @@
-//minimal self-contained example from the RufusJWB fork
+// minimal self-contained example from the RufusJWB fork
+// run `go run cmd/cmptest/main.go` to invoke this logic
 
 package main
 
